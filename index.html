@@ -1,0 +1,619 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Porra Doble</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Work+Sans:wght@400;500;600;700&display=swap">
+<style>
+  :root{
+    --bg:#0b1f17;
+    --panel:#123626;
+    --panel-alt:#0f2b20;
+    --paper:#f3ecd9;
+    --paper-line:#d8cca4;
+    --ink:#eef7ee;
+    --ink-soft:#c9dccc;
+    --ink-dim:#7fa38d;
+    --gold:#e8b94b;
+    --gold-dim:#a9843a;
+    --red:#d9614f;
+    --line:rgba(232,185,75,0.22);
+    --radius:14px;
+    color-scheme: dark;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(ellipse 900px 500px at 50% -10%, rgba(63,174,111,0.18), transparent),
+      var(--bg);
+    color:var(--ink);
+    font-family:"Work Sans", system-ui, sans-serif;
+    padding:0 18px;
+    padding-block: 28px 48px;
+    min-height:100vh;
+    line-height:1.45;
+  }
+  .wrap{ max-width:720px; margin:0 auto; display:flex; flex-direction:column; gap:22px; }
+  h1,h2,h3{ font-family:"Oswald", "Arial Narrow", sans-serif; text-transform:uppercase; letter-spacing:0.03em; margin:0; }
+  .marquee{ background:linear-gradient(180deg, var(--panel-alt), var(--panel)); border:1px solid var(--line); border-radius:var(--radius); padding:20px 20px 18px; text-align:center; position:relative; overflow:hidden; }
+  .marquee .eyebrow{ font-size:0.72rem; letter-spacing:0.22em; color:var(--gold); font-weight:600; text-transform:uppercase; }
+  .marquee h1{ font-size:clamp(1.8rem, 6vw, 2.6rem); color:var(--ink); margin-top:4px; }
+  .marquee h1 .ball{ color:var(--gold); }
+  .marquee .sub{ color:var(--ink-soft); font-size:0.92rem; margin-top:6px; }
+
+  .role-bar{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+  .role-pill{ display:inline-flex; align-items:center; gap:6px; background:var(--panel); border:1px solid var(--line); border-radius:999px; padding:6px 12px; font-size:0.78rem; font-weight:600; color:var(--ink-soft); }
+  .role-pill.is-admin{ border-color:var(--gold-dim); color:var(--gold); }
+  .role-pill .dot{ width:7px; height:7px; border-radius:50%; background:var(--ink-dim); }
+  .role-pill.is-admin .dot{ background:var(--gold); }
+  .admin-login{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .admin-login input{ width:120px; }
+
+  .bote{ background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:18px 20px; }
+  .bote-view{ display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+  .bote-label{ font-size:0.75rem; letter-spacing:0.16em; text-transform:uppercase; color:var(--ink-dim); font-weight:600; }
+  .bote-headline{ font-family:"Oswald", sans-serif; font-variant-numeric:tabular-nums; font-size:1.9rem; color:var(--gold); line-height:1.15; }
+  .bote-desc{ color:var(--ink-soft); font-size:0.9rem; margin-top:4px; }
+  .bote-type-badge{ font-size:0.68rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink-dim); border:1px solid var(--line); border-radius:999px; padding:3px 9px; display:inline-block; margin-bottom:6px; }
+  .bote-edit{ margin-top:16px; padding-top:16px; border-top:1px dashed var(--line); display:flex; flex-direction:column; gap:10px; }
+  .type-toggle{ display:flex; gap:8px; }
+  .type-toggle button{ flex:1; background:var(--panel-alt); color:var(--ink-soft); border:1px solid var(--line); }
+  .type-toggle button.active{ background:rgba(232,185,75,0.14); border-color:var(--gold-dim); color:var(--gold); }
+  .field-row{ display:flex; gap:8px; } .field-row > div{ flex:1; }
+
+  input[type="text"], input[type="number"], input[type="password"], input[type="datetime-local"]{
+    background:var(--bg); border:1px solid rgba(232,185,75,0.35); color:var(--ink); border-radius:8px;
+    padding:9px 10px; font-family:"Work Sans", sans-serif; font-size:0.92rem; width:100%;
+  }
+  input[type="number"]{ font-family:"Oswald", sans-serif; font-variant-numeric:tabular-nums; text-align:center; }
+  input::placeholder{ color:var(--ink-dim); }
+  input:focus, button:focus{ outline:2px solid var(--gold); outline-offset:1px; }
+  label{ font-size:0.72rem; color:var(--ink-dim); text-transform:uppercase; letter-spacing:0.08em; font-weight:600; display:block; margin-bottom:4px; }
+
+  button{ font-family:"Work Sans", sans-serif; font-weight:600; font-size:0.88rem; border-radius:9px; border:1px solid transparent; padding:10px 16px; cursor:pointer; }
+  button:disabled{ opacity:0.45; cursor:not-allowed; }
+  .btn-gold{ background:var(--gold); color:#1c1305; }
+  .btn-gold:hover{ filter:brightness(1.07); }
+  .btn-ghost{ background:transparent; color:var(--ink-soft); border-color:var(--line); }
+  .btn-ghost:hover{ border-color:var(--gold-dim); color:var(--ink); }
+  .btn-danger{ background:transparent; color:var(--red); border-color:rgba(217,97,79,0.4); padding:6px 10px; font-size:0.78rem; }
+  .btn-danger:hover{ background:rgba(217,97,79,0.12); }
+  .btn-small{ padding:7px 12px; font-size:0.8rem; }
+
+  section.panel{ background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:20px; }
+  section.panel.admin-only{ border-color:var(--gold-dim); background:linear-gradient(180deg, rgba(232,185,75,0.05), var(--panel)); }
+  .panel h2{ font-size:1.1rem; color:var(--ink); display:flex; align-items:center; gap:10px; }
+  .panel h2 .num{ color:var(--gold); font-size:0.85em; }
+  .panel-intro{ color:var(--ink-dim); font-size:0.85rem; margin-top:4px; margin-bottom:16px; }
+
+  .deadline-status{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; background:var(--panel-alt); border:1px solid var(--line); border-radius:10px; padding:12px 14px; margin-bottom:14px; font-size:0.88rem; }
+  .deadline-status .chip{ font-size:0.68rem; letter-spacing:0.08em; text-transform:uppercase; font-weight:700; padding:3px 9px; border-radius:999px; }
+  .chip.open{ background:rgba(63,174,111,0.18); color:#8fe0ab; }
+  .chip.closed{ background:rgba(217,97,79,0.18); color:#f3b3a6; }
+  .chip.none{ background:rgba(255,255,255,0.06); color:var(--ink-dim); }
+
+  .matches{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:520px){ .matches{ grid-template-columns:1fr; } }
+  .match-card{ background:var(--panel-alt); border:1px solid var(--line); border-radius:10px; padding:14px; display:flex; flex-direction:column; gap:10px; }
+  .match-card .tag{ font-size:0.7rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink-dim); font-weight:600; }
+  .match-card h3{ font-size:1.05rem; color:var(--ink); text-transform:none; letter-spacing:0; }
+  .vs-row{ display:flex; align-items:center; gap:8px; }
+  .vs-row input{ flex:1; }
+  .vs{ color:var(--gold-dim); font-family:"Oswald",sans-serif; font-size:0.85rem; }
+
+  .bet-form{ display:flex; flex-direction:column; gap:12px; }
+  .score-inputs{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  @media (max-width:520px){ .score-inputs{ grid-template-columns:1fr; } }
+  .score-pair{ background:var(--panel-alt); border:1px solid var(--line); border-radius:10px; padding:10px 12px; }
+  .score-pair .teams{ font-size:0.78rem; color:var(--ink-soft); margin-bottom:8px; text-align:center; }
+  .score-pair .digits{ display:flex; align-items:center; justify-content:center; gap:8px; }
+  .score-pair input{ width:56px; text-align:center; font-size:1.15rem; }
+  .score-pair .dash{ color:var(--gold-dim); font-family:"Oswald",sans-serif; font-size:1.2rem; }
+
+  .closed-note{ background:rgba(217,97,79,0.1); border:1px solid rgba(217,97,79,0.35); color:#f3b3a6; border-radius:10px; padding:12px 14px; font-size:0.88rem; }
+  .form-msg{ font-size:0.82rem; padding:8px 10px; border-radius:8px; display:none; }
+  .form-msg.show{ display:block; }
+  .form-msg.error{ background:rgba(217,97,79,0.14); color:#f3b3a6; }
+  .form-msg.ok{ background:rgba(63,174,111,0.14); color:#a9e6c2; }
+
+  .tickets{ display:flex; flex-direction:column; gap:8px; margin-top:16px; }
+  .ticket{ background:var(--paper); color:#241c0e; border-radius:10px; padding:11px 14px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; border:1px dashed var(--paper-line); }
+  .ticket.winner{ background:linear-gradient(180deg, #fff3d1, var(--paper)); border:1px solid var(--gold); box-shadow:0 0 0 1px rgba(232,185,75,0.35); }
+  .ticket .who{ font-weight:600; font-size:0.95rem; }
+  .ticket .who .crown{ color:var(--gold-dim); margin-right:4px; }
+  .ticket .picks{ font-family:"Oswald", sans-serif; font-variant-numeric:tabular-nums; font-size:1rem; color:#3a2e14; display:flex; gap:14px; }
+  .ticket .picks span{ white-space:nowrap; }
+  .ticket-actions{ display:flex; align-items:center; gap:8px; }
+  .empty-note{ color:var(--ink-dim); font-size:0.85rem; font-style:italic; padding:10px 2px; }
+
+  .result-row{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; background:var(--panel-alt); border:1px solid var(--line); border-radius:10px; padding:12px 14px; margin-bottom:10px; }
+  .result-row .teams{ flex:1; min-width:160px; font-size:0.9rem; color:var(--ink-soft); }
+  .result-row .digits{ display:flex; align-items:center; gap:8px; }
+  .result-row input{ width:56px; text-align:center; }
+
+  .winner-banner{ margin-top:14px; background:linear-gradient(135deg, rgba(232,185,75,0.16), rgba(232,185,75,0.04)); border:1px solid var(--gold); border-radius:10px; padding:16px; text-align:center; }
+  .winner-banner .headline{ font-family:"Oswald", sans-serif; color:var(--gold); font-size:1.35rem; }
+  .winner-banner .names{ color:var(--ink); font-weight:600; margin-top:4px; }
+  .winner-banner .fineprint{ color:var(--ink-soft); font-size:0.85rem; margin-top:4px; }
+  .winner-banner .none{ color:var(--ink-soft); }
+
+  .admin-actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top:6px; }
+  .foot-note{ text-align:center; color:var(--ink-dim); font-size:0.78rem; padding-top:4px; }
+  .conn-note{ text-align:center; color:var(--ink-dim); font-size:0.78rem; }
+  .conn-note.err{ color:var(--red); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="marquee">
+    <div class="eyebrow">Peña de Lotería</div>
+    <h1>Porra <span class="ball">⚽</span> Doble</h1>
+    <div class="sub">Acierta el marcador exacto de los dos partidos. Resultado repetido, no vale.</div>
+  </div>
+
+  <div class="role-bar">
+    <div class="role-pill" id="rolePill"><span class="dot"></span><span id="roleLabel">Modo socio</span></div>
+    <div id="roleAction"></div>
+  </div>
+
+  <div id="connNote" class="conn-note">Conectando…</div>
+
+  <div class="bote">
+    <div class="bote-view" id="boteView"></div>
+    <div class="bote-edit admin-only" id="boteEdit" hidden>
+      <div class="type-toggle">
+        <button type="button" id="typeDineroBtn">💶 Dinero</button>
+        <button type="button" id="typeObjetoBtn">🎁 Objeto / regalo</button>
+      </div>
+      <div class="field-row" id="dineroFields">
+        <div><label for="boteAmount">Importe (€)</label><input type="number" id="boteAmount" min="0" step="1" inputmode="decimal"></div>
+      </div>
+      <div><label for="boteDesc" id="boteDescLabel">Descripción</label><input type="text" id="boteDesc" placeholder="p. ej. Bote jornada 4"></div>
+    </div>
+  </div>
+
+  <section class="panel admin-only" id="deadlinePanel" hidden>
+    <h2><span class="num">01</span> Plazo de apuestas</h2>
+    <div class="panel-intro">Fecha y hora tope para apostar. Pasado ese momento, se cierra el formulario a los socios.</div>
+    <div class="field-row">
+      <div><label for="deadlineInput">Cierre de apuestas</label><input type="datetime-local" id="deadlineInput"></div>
+      <div style="display:flex; align-items:flex-end;"><button class="btn-ghost" id="clearDeadlineBtn" type="button">Quitar plazo</button></div>
+    </div>
+  </section>
+
+  <div class="deadline-status" id="deadlineStatus"></div>
+
+  <section class="panel admin-only" id="matchesPanel" hidden>
+    <h2><span class="num">02</span> Partidos de la jornada</h2>
+    <div class="panel-intro">Edita los equipos de los dos partidos en juego.</div>
+    <div class="matches">
+      <div class="match-card">
+        <div class="tag">Partido 1</div>
+        <div class="vs-row"><input type="text" id="m0home" placeholder="Equipo local"><span class="vs">vs</span><input type="text" id="m0away" placeholder="Equipo visitante"></div>
+      </div>
+      <div class="match-card">
+        <div class="tag">Partido 2</div>
+        <div class="vs-row"><input type="text" id="m1home" placeholder="Equipo local"><span class="vs">vs</span><input type="text" id="m1away" placeholder="Equipo visitante"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="matchesReadPanel">
+    <h2><span class="num">02</span> Partidos de la jornada</h2>
+    <div class="matches" id="matchesReadView"></div>
+  </section>
+
+  <section class="panel">
+    <h2><span class="num">03</span> Hacer una apuesta</h2>
+    <div class="panel-intro">Cada socio elige un marcador exacto para cada partido. No se puede repetir una combinación ya elegida.</div>
+    <div id="betFormArea"></div>
+    <div class="tickets" id="ticketList"></div>
+  </section>
+
+  <section class="panel admin-only" id="resultsPanel" hidden>
+    <h2><span class="num">04</span> Resultado final</h2>
+    <div class="panel-intro">Cuando terminen los partidos, introduce el marcador real para calcular quién gana.</div>
+    <div class="result-row">
+      <div class="teams" id="resLabel0">Partido 1</div>
+      <div class="digits"><input type="number" id="res0home" min="0" placeholder="–"><span class="dash">–</span><input type="number" id="res0away" min="0" placeholder="–"></div>
+    </div>
+    <div class="result-row">
+      <div class="teams" id="resLabel1">Partido 2</div>
+      <div class="digits"><input type="number" id="res1home" min="0" placeholder="–"><span class="dash">–</span><input type="number" id="res1away" min="0" placeholder="–"></div>
+    </div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <button class="btn-gold" id="calcBtn" type="button">Guardar resultado</button>
+      <button class="btn-ghost" id="clearResBtn" type="button">Borrar resultado</button>
+    </div>
+    <div id="winnerBanner"></div>
+    <div class="admin-actions">
+      <button class="btn-ghost btn-small" id="exportBtn" type="button">⬇ Exportar jornada</button>
+      <button class="btn-ghost btn-small" id="newRoundBtn" type="button">↻ Nueva jornada</button>
+    </div>
+  </section>
+
+  <section class="panel" id="winnerReadPanel" hidden>
+    <h2><span class="num">04</span> Resultado</h2>
+    <div id="winnerBannerRead"></div>
+  </section>
+
+  <div class="foot-note">Porra Doble · datos compartidos en vivo con todos los socios</div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+import {
+  getFirestore, doc, getDoc, setDoc, onSnapshot,
+  collection, deleteDoc
+} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBmef5N3LO0rxiKdtHEEZqUvyRLoljI8Ss",
+  authDomain: "lacapital-df58b.firebaseapp.com",
+  projectId: "lacapital-df58b",
+  storageBucket: "lacapital-df58b.firebasestorage.app",
+  messagingSenderId: "407607942867",
+  appId: "1:407607942867:web:46b8e1a0887d1e83e4be26"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const configRef = doc(db, "porra", "config");
+const entriesCol = collection(db, "porra_entries");
+
+const ADMIN_KEY = "porra-doble-admin-v1";
+const ADMIN_PIN = "1234"; // cámbialo aquí y vuelve a subir el archivo si quieres otro PIN
+
+const defaultConfig = {
+  matches: [ { home: "Sporting", away: "Oviedo" }, { home: "Barcelona", away: "Real Madrid" } ],
+  bote: { type: "dinero", amount: 50, desc: "Bote de la jornada" },
+  deadline: "",
+  results: [null, null]
+};
+
+let state = JSON.parse(JSON.stringify(defaultConfig));
+let entries = [];
+let isAdmin = false;
+try { isAdmin = sessionStorage.getItem(ADMIN_KEY) === "1"; } catch(e){ isAdmin = false; }
+
+function $(id){ return document.getElementById(id); }
+function escapeHtml(str){ const d = document.createElement("div"); d.textContent = str == null ? "" : str; return d.innerHTML; }
+function teamLabel(m){ return (m.home || "Local").trim() + " – " + (m.away || "Visitante").trim(); }
+function pickKey(picks){ return picks.map(p => p.home + "-" + p.away).join("_"); }
+function fmtDeadline(iso){
+  if(!iso) return "";
+  const d = new Date(iso);
+  if(isNaN(d.getTime())) return "";
+  return d.toLocaleString("es-ES", { day:"2-digit", month:"2-digit", year:"numeric", hour:"2-digit", minute:"2-digit" });
+}
+function isClosed(){
+  if(!state.deadline) return false;
+  const d = new Date(state.deadline);
+  if(isNaN(d.getTime())) return false;
+  return Date.now() > d.getTime();
+}
+
+async function ensureConfigDoc(){
+  const snap = await getDoc(configRef);
+  if(!snap.exists()){
+    await setDoc(configRef, defaultConfig);
+  }
+}
+async function saveConfig(){
+  try { await setDoc(configRef, state); }
+  catch(e){ console.error(e); alert("No se pudo guardar: " + e.message); }
+}
+
+// ---------------- role ----------------
+function renderRole(){
+  const pill = $("rolePill"), label = $("roleLabel"), action = $("roleAction");
+  pill.className = "role-pill" + (isAdmin ? " is-admin" : "");
+  label.textContent = isAdmin ? "Modo administrador" : "Modo socio";
+  action.innerHTML = "";
+  if(isAdmin){
+    const out = document.createElement("button");
+    out.className = "btn-ghost btn-small"; out.type = "button"; out.textContent = "Salir del modo admin";
+    out.addEventListener("click", () => { isAdmin = false; try{ sessionStorage.removeItem(ADMIN_KEY); }catch(e){} renderAll(); });
+    action.appendChild(out);
+  } else {
+    const wrap = document.createElement("div");
+    wrap.className = "admin-login";
+    wrap.innerHTML = '<input type="password" id="pinInput" placeholder="PIN admin" inputmode="numeric">' +
+      '<button class="btn-ghost btn-small" id="pinBtn" type="button">Entrar como admin</button>' +
+      '<span class="form-msg error" id="pinMsg"></span>';
+    action.appendChild(wrap);
+    $("pinBtn").addEventListener("click", () => {
+      const val = $("pinInput").value.trim();
+      if(val === ADMIN_PIN){ isAdmin = true; try{ sessionStorage.setItem(ADMIN_KEY, "1"); }catch(e){} renderAll(); }
+      else { const msg = $("pinMsg"); msg.classList.add("show"); msg.textContent = "PIN incorrecto."; }
+    });
+  }
+  document.querySelectorAll(".admin-only").forEach(el => el.hidden = !isAdmin);
+  $("matchesReadPanel").hidden = isAdmin;
+  $("boteEdit").hidden = !isAdmin;
+}
+
+// ---------------- bote ----------------
+function renderBote(){
+  const view = $("boteView");
+  const typeText = state.bote.type === "objeto" ? "Premio en juego" : "Bote de esta jornada";
+  const headline = state.bote.type === "objeto"
+    ? escapeHtml(state.bote.desc || "Por definir")
+    : (Number(state.bote.amount) || 0).toLocaleString("es-ES") + " €";
+  const sub = state.bote.type === "objeto" ? "" : escapeHtml(state.bote.desc || "");
+  view.innerHTML =
+    '<div><span class="bote-type-badge">' + (state.bote.type === "objeto" ? "🎁 Objeto" : "💶 Dinero") + '</span>' +
+    '<div class="bote-label">' + typeText + '</div>' +
+    '<div class="bote-headline">' + headline + '</div>' +
+    (sub ? '<div class="bote-desc">' + sub + '</div>' : '') + '</div>';
+
+  const isObjeto = state.bote.type === "objeto";
+  $("typeDineroBtn").className = isObjeto ? "" : "active";
+  $("typeObjetoBtn").className = isObjeto ? "active" : "";
+  $("dineroFields").hidden = isObjeto;
+  $("boteAmount").value = state.bote.amount;
+  $("boteDesc").value = state.bote.desc;
+  $("boteDescLabel").textContent = isObjeto ? "¿Qué es el premio?" : "Descripción (opcional)";
+  $("boteDesc").placeholder = isObjeto ? "p. ej. Cena para dos en El Triskel" : "p. ej. Bote jornada 4";
+}
+$("typeDineroBtn").addEventListener("click", () => { state.bote.type = "dinero"; saveConfig(); });
+$("typeObjetoBtn").addEventListener("click", () => { state.bote.type = "objeto"; saveConfig(); });
+$("boteAmount").addEventListener("change", () => { state.bote.amount = $("boteAmount").value; saveConfig(); });
+$("boteDesc").addEventListener("change", () => { state.bote.desc = $("boteDesc").value; saveConfig(); });
+
+// ---------------- deadline ----------------
+function renderDeadline(){
+  $("deadlineInput").value = state.deadline || "";
+  const box = $("deadlineStatus");
+  if(!state.deadline){
+    box.innerHTML = '<span class="chip none">SIN PLAZO</span><span>El administrador todavía no ha fijado cierre de apuestas.</span>';
+    return;
+  }
+  const closed = isClosed();
+  box.innerHTML = '<span class="chip ' + (closed ? "closed" : "open") + '">' + (closed ? "CERRADO" : "ABIERTO") + '</span>' +
+    '<span>' + (closed ? "Las apuestas se cerraron el " : "Apuestas abiertas hasta el ") + fmtDeadline(state.deadline) + '</span>';
+}
+$("deadlineInput").addEventListener("change", () => { state.deadline = $("deadlineInput").value; saveConfig(); });
+$("clearDeadlineBtn").addEventListener("click", () => { state.deadline = ""; saveConfig(); });
+
+// ---------------- matches ----------------
+function renderMatches(){
+  $("m0home").value = state.matches[0].home; $("m0away").value = state.matches[0].away;
+  $("m1home").value = state.matches[1].home; $("m1away").value = state.matches[1].away;
+  $("matchesReadView").innerHTML = state.matches.map((m,i) =>
+    '<div class="match-card"><div class="tag">Partido ' + (i+1) + '</div><h3>' + escapeHtml(teamLabel(m)) + '</h3></div>'
+  ).join("");
+  $("resLabel0").textContent = teamLabel(state.matches[0]);
+  $("resLabel1").textContent = teamLabel(state.matches[1]);
+}
+["m0home","m0away","m1home","m1away"].forEach(id => {
+  $(id).addEventListener("change", () => {
+    const idx = id.charAt(1) === "0" ? 0 : 1;
+    const side = id.indexOf("home") > -1 ? "home" : "away";
+    state.matches[idx][side] = $(id).value;
+    saveConfig();
+  });
+});
+
+// ---------------- bet form ----------------
+function renderBetForm(){
+  const area = $("betFormArea");
+  if(isClosed()){
+    area.innerHTML = '<div class="closed-note">Las apuestas están cerradas para esta jornada. Habla con el administrador si necesitas cambiar algo.</div>';
+    return;
+  }
+  area.innerHTML =
+    '<div class="bet-form">' +
+      '<div class="name-row"><label for="betName">Nombre del socio</label><input type="text" id="betName" placeholder="¿Quién apuesta?"></div>' +
+      '<div class="score-inputs">' +
+        '<div class="score-pair"><div class="teams">' + escapeHtml(teamLabel(state.matches[0])) + '</div>' +
+          '<div class="digits"><input type="number" id="bet0home" min="0" max="20" placeholder="0"><span class="dash">–</span><input type="number" id="bet0away" min="0" max="20" placeholder="0"></div></div>' +
+        '<div class="score-pair"><div class="teams">' + escapeHtml(teamLabel(state.matches[1])) + '</div>' +
+          '<div class="digits"><input type="number" id="bet1home" min="0" max="20" placeholder="0"><span class="dash">–</span><input type="number" id="bet1away" min="0" max="20" placeholder="0"></div></div>' +
+      '</div>' +
+      '<div class="form-msg" id="formMsg"></div>' +
+      '<div><button class="btn-gold" id="addBetBtn" type="button">Añadir apuesta</button></div>' +
+    '</div>';
+  $("addBetBtn").addEventListener("click", handleAddBet);
+}
+function showMsg(text, kind){
+  const el = $("formMsg"); if(!el) return;
+  el.textContent = text; el.className = "form-msg show " + kind;
+}
+async function handleAddBet(){
+  const name = $("betName").value.trim();
+  const h0 = $("bet0home").value, a0 = $("bet0away").value, h1 = $("bet1home").value, a1 = $("bet1away").value;
+  if(!name){ showMsg("Falta el nombre del socio.", "error"); return; }
+  if(h0 === "" || a0 === "" || h1 === "" || a1 === ""){ showMsg("Rellena los cuatro marcadores.", "error"); return; }
+  const picks = [
+    { home: String(parseInt(h0,10)), away: String(parseInt(a0,10)) },
+    { home: String(parseInt(h1,10)), away: String(parseInt(a1,10)) }
+  ];
+  if(picks.some(p => isNaN(Number(p.home)) || isNaN(Number(p.away)))){ showMsg("Los marcadores tienen que ser números.", "error"); return; }
+  const id = pickKey(picks);
+  const btn = $("addBetBtn"); btn.disabled = true;
+  try {
+    await setDoc(doc(entriesCol, id), { name, picks, createdAt: Date.now() });
+    $("betName").value = ""; $("bet0home").value = ""; $("bet0away").value = ""; $("bet1home").value = ""; $("bet1away").value = "";
+    showMsg("Apuesta añadida para " + name + ".", "ok");
+  } catch(e){
+    showMsg("Ese resultado combinado ya lo tiene otro socio, o hubo un error. Elige otro marcador.", "error");
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function computeWinners(){
+  const r0 = state.results[0], r1 = state.results[1];
+  if(!r0 || !r1) return null;
+  return entries.filter(e => {
+    const p0 = e.picks[0], p1 = e.picks[1];
+    return p0.home === r0.home && p0.away === r0.away && p1.home === r1.home && p1.away === r1.away;
+  });
+}
+
+function renderTickets(){
+  const list = $("ticketList");
+  if(entries.length === 0){ list.innerHTML = '<div class="empty-note">Todavía no hay apuestas para esta jornada.</div>'; return; }
+  const winners = computeWinners();
+  const winnerIds = winners ? winners.map(w => w.id) : [];
+  list.innerHTML = "";
+  entries.forEach(entry => {
+    const row = document.createElement("div");
+    row.className = "ticket" + (winnerIds.indexOf(entry.id) > -1 ? " winner" : "");
+    row.innerHTML =
+      '<div class="who">' + (winnerIds.indexOf(entry.id) > -1 ? '<span class="crown">🏆</span>' : "") + escapeHtml(entry.name) + '</div>' +
+      '<div class="picks"><span>' + entry.picks[0].home + '–' + entry.picks[0].away + '</span><span>' + entry.picks[1].home + '–' + entry.picks[1].away + '</span></div>';
+    const actions = document.createElement("div");
+    actions.className = "ticket-actions";
+    if(isAdmin){
+      const delBtn = document.createElement("button");
+      delBtn.className = "btn-danger"; delBtn.type = "button"; delBtn.textContent = "Quitar";
+      delBtn.addEventListener("click", async () => { await deleteDoc(doc(entriesCol, entry.id)); });
+      actions.appendChild(delBtn);
+    }
+    row.appendChild(actions);
+    list.appendChild(row);
+  });
+}
+
+// ---------------- results / winner ----------------
+function renderResultsInputs(){
+  const r0 = state.results[0], r1 = state.results[1];
+  $("res0home").value = r0 ? r0.home : ""; $("res0away").value = r0 ? r0.away : "";
+  $("res1home").value = r1 ? r1.home : ""; $("res1away").value = r1 ? r1.away : "";
+}
+$("calcBtn").addEventListener("click", () => {
+  const v = { r0h:$("res0home").value, r0a:$("res0away").value, r1h:$("res1home").value, r1a:$("res1away").value };
+  if(v.r0h === "" || v.r0a === "" || v.r1h === "" || v.r1a === ""){ state.results = [null, null]; }
+  else {
+    state.results = [
+      { home:String(parseInt(v.r0h,10)), away:String(parseInt(v.r0a,10)) },
+      { home:String(parseInt(v.r1h,10)), away:String(parseInt(v.r1a,10)) }
+    ];
+  }
+  saveConfig();
+});
+$("clearResBtn").addEventListener("click", () => { state.results = [null, null]; saveConfig(); });
+
+function winnerHtml(){
+  const winners = computeWinners();
+  if(winners === null) return '<div class="winner-banner"><div class="none">Resultado todavía sin confirmar.</div></div>';
+  if(winners.length === 0) return '<div class="winner-banner"><div class="none">Nadie ha acertado los dos resultados exactos esta jornada.</div></div>';
+  const names = winners.map(w => escapeHtml(w.name)).join(", ");
+  if(state.bote.type === "objeto"){
+    const prize = escapeHtml(state.bote.desc || "el premio");
+    const fine = winners.length > 1 ? "Hay " + winners.length + " ganadores: tendréis que decidir cómo os repartís \"" + prize + "\"." : "Se lleva: " + prize;
+    return '<div class="winner-banner"><div class="headline">🏆 ¡Acierto pleno!</div><div class="names">' + names + '</div><div class="fineprint">' + fine + '</div></div>';
+  }
+  const amount = Number(state.bote.amount) || 0;
+  const share = winners.length ? amount / winners.length : 0;
+  const fine = winners.length > 1
+    ? share.toLocaleString("es-ES", {maximumFractionDigits:2}) + " € cada uno (bote repartido entre " + winners.length + ")"
+    : "se lo lleva entero";
+  return '<div class="winner-banner"><div class="headline">🏆 ' + amount.toLocaleString("es-ES") + ' €</div><div class="names">' + names + '</div><div class="fineprint">' + fine + '</div></div>';
+}
+function renderWinner(){
+  $("winnerBanner").innerHTML = winnerHtml();
+  const readPanel = $("winnerReadPanel");
+  const hasResult = state.results[0] && state.results[1];
+  readPanel.hidden = !hasResult;
+  if(hasResult) $("winnerBannerRead").innerHTML = winnerHtml();
+}
+
+// ---------------- export ----------------
+function buildExportText(){
+  const lines = [];
+  lines.push("PORRA DOBLE — " + new Date().toLocaleString("es-ES"));
+  lines.push("");
+  lines.push("Premio: " + (state.bote.type === "objeto" ? state.bote.desc : (Number(state.bote.amount)||0).toLocaleString("es-ES") + " €" + (state.bote.desc ? " — " + state.bote.desc : "")));
+  lines.push("Plazo de apuestas: " + (state.deadline ? fmtDeadline(state.deadline) : "sin definir"));
+  lines.push("");
+  lines.push("Partido 1: " + teamLabel(state.matches[0]));
+  lines.push("Partido 2: " + teamLabel(state.matches[1]));
+  lines.push("");
+  lines.push("Apuestas (" + entries.length + "):");
+  entries.forEach(e => lines.push("  - " + e.name + ": " + e.picks[0].home + "-" + e.picks[0].away + " / " + e.picks[1].home + "-" + e.picks[1].away));
+  lines.push("");
+  const r0 = state.results[0], r1 = state.results[1];
+  lines.push("Resultado final: " + (r0 && r1 ? (r0.home+"-"+r0.away+" / "+r1.home+"-"+r1.away) : "pendiente"));
+  const winners = computeWinners();
+  if(winners && winners.length) lines.push("Ganador(es): " + winners.map(w => w.name).join(", "));
+  else if(winners) lines.push("Ganador(es): nadie acertó");
+  return lines.join("\n");
+}
+$("exportBtn").addEventListener("click", () => {
+  const text = buildExportText();
+  const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = "porra-" + new Date().toISOString().slice(0,10) + ".txt";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
+
+$("newRoundBtn").addEventListener("click", async () => {
+  if(!window.confirm("Esto borra las apuestas y el resultado de esta jornada (los partidos y el premio se mantienen para editarlos). ¿Seguro?")) return;
+  state.results = [null, null];
+  state.deadline = "";
+  await saveConfig();
+  await Promise.all(entries.map(e => deleteDoc(doc(entriesCol, e.id))));
+});
+
+function renderAll(){
+  renderRole();
+  renderBote();
+  renderDeadline();
+  renderMatches();
+  renderBetForm();
+  renderResultsInputs();
+  renderTickets();
+  renderWinner();
+}
+
+// ---------------- live sync ----------------
+async function start(){
+  try {
+    await ensureConfigDoc();
+  } catch(e){
+    $("connNote").textContent = "No se pudo conectar con la base de datos: " + e.message;
+    $("connNote").classList.add("err");
+    return;
+  }
+
+  onSnapshot(configRef, snap => {
+    if(snap.exists()){
+      const data = snap.data();
+      state = {
+        matches: data.matches || defaultConfig.matches,
+        bote: data.bote || defaultConfig.bote,
+        deadline: typeof data.deadline === "string" ? data.deadline : "",
+        results: data.results || [null, null]
+      };
+      $("connNote").textContent = "";
+      renderAll();
+    }
+  }, err => {
+    $("connNote").textContent = "Error de conexión: " + err.message;
+    $("connNote").classList.add("err");
+  });
+
+  onSnapshot(entriesCol, snap => {
+    entries = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderTickets();
+    renderWinner();
+  }, err => {
+    $("connNote").textContent = "Error leyendo apuestas: " + err.message;
+    $("connNote").classList.add("err");
+  });
+
+  renderAll();
+}
+
+start();
+</script>
+</body>
+</html>
